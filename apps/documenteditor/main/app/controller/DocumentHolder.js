@@ -1554,9 +1554,10 @@ define([
                 }));
             }
 
-            let X = (obj._pagePos.realX + obj._pagePos.w) / AscCommon.AscBrowser.retinaPixelRatio;
-            let Y = (obj._pagePos.realY + obj._pagePos.h) / AscCommon.AscBrowser.retinaPixelRatio;
-            menuContainer.css({left: X, top : Y});
+            
+            let oGlobalCoords = AscPDFEditor.private_getGlobalCoordsByPageCoords(obj._pagePos.x + obj._pagePos.w, obj._pagePos.y + obj._pagePos.h, obj._page, true);
+            
+            menuContainer.css({left: oGlobalCoords.X, top : oGlobalCoords.Y});
             menuContainer.attr('data-value', 'prevent-canvas-click');
             this._preventClick = true;
             menu.show();
