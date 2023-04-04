@@ -214,6 +214,9 @@ define([
                 }
                 event.dataTransfer.effectAllowed = 'copyMove';
                 this.bar.trigger('tab:dragstart', event.dataTransfer, this.bar.selectTabs);
+
+                var labelActiveTab = this.bar.$el.find('.active')[0].innerText;
+                this.bar.indexDragActive = _.findWhere(this.bar.selectTabs, {label: labelActiveTab}).index;
             }, this),
             dragenter: $.proxy(function (e) {
                 var event = e.originalEvent;
@@ -263,6 +266,8 @@ define([
                 this.bar.$el.find('.mousemove').removeClass('mousemove right');
                 this.bar.trigger('tab:drop', event.dataTransfer, index, (event.ctrlKey || Common.Utils.isMac && event.altKey));
                 this.bar.isDrop = true;
+                this.bar.tabs[this.bar.indexDragActive].hideOldTooltipe();
+                this.bar.tabs[index].elmSpan.tooltip('show');
             }, this)
         });
     };
@@ -328,6 +333,7 @@ define([
                         this.isDragDrop = true;
                     }
                     this.trigger('tab:drop', event.dataTransfer, 'last', (event.ctrlKey || Common.Utils.isMac && event.altKey));
+                    this.tabs[this.indexDragActive].hideOldTooltipe();
                 } else {
                     this.isDrop = undefined;
                 }

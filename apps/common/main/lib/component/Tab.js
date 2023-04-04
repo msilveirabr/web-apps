@@ -54,8 +54,8 @@ define([
         this.iconVisible = false;
         this.iconTitle = '';
         this.index = -1;
-        this.template   = _.template(['<li class="list-item <% if(active){ %>active selected<% } %> <% if(cls.length){%><%= cls %><%}%><% if(iconVisible){%> icon-visible <%}%>" data-label="<%- label %>">',
-                                            '<span tabtitle="<%- label %>" draggable="true" oo_editor_input="true" tabindex="-1" data-index="<%= index %>">',
+        this.template   = _.template(['<li class="list-item <% if(active){ %>active selected<% } %> <% if(cls.length){%><%= cls %><%}%><% if(iconVisible){%> icon-visible <%}%>"   data-label="<%- label %>">',
+                                            '<span tabtitle="<%- label %>" draggable="true" oo_editor_input="true" tabindex="-1" data-index="<%= index %>" data-toggle="tooltip" >',
                                             '<div class="toolbar__icon <% if(iconCls.length){%><%= iconCls %><%}%>" title="<% if(iconTitle.length){%><%=iconTitle%><%}%>"></div>',
                                             '<%- label %>',
                                             '</span>',
@@ -73,13 +73,29 @@ define([
         render: function() {
             var el      = this.template(this);
             this.$el    = $(el);
-            this.$el.find('span').tooltip({
+            this.elmSpan = this.$el.find('span');
+            this.elmSpan.tooltip({
                 title: this.label,
                 placement: 'cursor'});
+
+            this.elmSpan.on('mousedown', function () {
+                $(this).tooltip('hide');
+            });
+
             this.rendered = true;
             this.disable(this.disabled);
             return this;
         },
+
+        hideOldTooltipe: function(){
+            this.bindMuseOver = _.bind(this.mouseOver,this);
+            this.elmSpan.on('mouseover', this.bindMuseOver);
+        },
+        mouseOver: function() {
+            this.elmSpan.tooltip('hide');
+            this.elmSpan.off('mouseover', this.bindMuseOver);
+        },
+
 
         isActive: function() {
             return this.$el.hasClass('active');
