@@ -229,7 +229,9 @@ define([
                     this.api.asc_registerCallback('asc_onPrintUrl',                 _.bind(this.onPrintUrl, this));
                     this.api.asc_registerCallback('asc_onMeta',                     _.bind(this.onMeta, this));
                     this.api.asc_registerCallback('asc_onSpellCheckInit',           _.bind(this.loadLanguages, this));
-                    this.api.asc_registerCallback('asc_onOpenLinkForm',             _.bind(this.onOpenLinkForm, this));
+                    this.api.asc_registerCallback('asc_onOpenLinkPdfForm',          _.bind(this.onOpenLinkPdfForm, this));
+                    this.api.asc_registerCallback('asc_onOpenFilePdfForm',          _.bind(this.onOpenFilePdfForm, this));
+                    this.api.asc_registerCallback('asc_onValidateErrorPdfForm',     _.bind(this.onValidateErrorPdfForm, this));
 
                     Common.NotificationCenter.on('api:disconnect',                  _.bind(this.onCoAuthoringDisconnect, this));
                     Common.NotificationCenter.on('goback',                          _.bind(this.goBack, this));
@@ -2120,7 +2122,7 @@ define([
                 (id!==undefined) && Common.component.Analytics.trackEvent('Internal Error', id.toString());
             },
 
-            onOpenLinkForm: function(sURI, onAllow, onCancel) {
+            onOpenLinkPdfForm: function(sURI, onAllow, onCancel) {
                 var config = {
                     closable: true
                 };
@@ -2140,9 +2142,8 @@ define([
                     if (btn == 'ok' && window.event && window.event.ctrlKey == true) {
                         onAllow();
                     }
-                    // else {
-                    //     onCancel()
-                    // }
+                    else
+                        onCancel();
                 }, this);
 
                 if (Common.Utils.ModalWindow.isVisible())
@@ -2152,6 +2153,77 @@ define([
 
                 (id!==undefined) && Common.component.Analytics.trackEvent('Internal Error', id.toString());
             },
+
+            onOpenFilePdfForm: function(onAllow, onCancel) {
+                var config = {
+                    closable: true
+                };
+
+                let id = 1;
+
+                config.msg = this.securityWarningOpenFile;
+
+                Common.Gateway.reportWarning(id, config.msg);
+
+                config.title    = this.notcriticalErrorTitle;
+                config.iconCls  = 'warn';
+                config.buttons  = ['ok', 'cancel'];
+                config.needCancel = onCancel ? false : true;
+
+                config.callback = _.bind(function(btn){
+                    if (btn == 'ok') {
+                        onAllow();
+                    }
+                    else
+                        onCancel();
+                }, this);
+
+                if (Common.Utils.ModalWindow.isVisible())
+                    Common.Utils.ModalWindow.close(true);
+
+                Common.UI.alert(config).$window.attr('data-value', id);
+
+                (id!==undefined) && Common.component.Analytics.trackEvent('Internal Error', id.toString());
+            },
+
+            onValidateErrorPdfForm: function(oInfo) {
+                var config = {
+                    closable: true
+                };
+
+                let id = 1;
+
+                if (oInfo["greater"] != null && oInfo["less"] != null) {
+                    config.msg = `Ivalid value: must be greater than or equal to ${oInfo["greater"]} \
+                    and less then or equal to ${oInfo["less"]}`;
+                }
+                else if (oInfo["greater"] != null) {
+                    config.msg = `Ivalid value: must be greater than or equal to ${oInfo["greater"]}`;
+                }
+                else if (oInfo["less"] != null) {
+                    config.msg = `Ivalid value: must be less than or equal to ${oInfo["less"]}`;
+                }
+                
+
+                Common.Gateway.reportWarning(id, config.msg);
+
+                config.title    = this.notcriticalErrorTitle;
+                config.iconCls  = 'warn';
+                config.buttons  = ['ok'];
+                config.needCancel = false;
+
+                
+                // config.callback = _.bind(function(btn){
+                // }, this);
+
+                if (Common.Utils.ModalWindow.isVisible())
+                    Common.Utils.ModalWindow.close(true);
+
+                Common.UI.alert(config).$window.attr('data-value', id);
+
+                (id!==undefined) && Common.component.Analytics.trackEvent('Internal Error', id.toString());
+            },
+
 
             onCoAuthoringDisconnect: function() {
                 this.getApplication().getController('Viewport').getView('Viewport').setMode({isDisconnected:true});
@@ -3455,7 +3527,8 @@ define([
             warnLicenseBefore: 'License not active.<br>Please contact your administrator.',
             titleLicenseNotActive: 'License not active',
             securityWarningLinkPart1: 'This document is trying to connect to:\r',
-            securityWarningLinkPart2: '\rIf you trust this site, press Ok while holding down the ctrl key.'
+            securityWarningLinkPart2: '\rIf you trust this site, press Ok while holding down the ctrl key.',
+            securityWarningOpenFile: 'This document is trying to open file dialog, press Ok to open'
         }
     })(), DE.Controllers.Main || {}))
 });
