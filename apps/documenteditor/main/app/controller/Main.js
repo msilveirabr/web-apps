@@ -2194,14 +2194,14 @@ define([
                 let id = 1;
 
                 if (oInfo["greater"] != null && oInfo["less"] != null) {
-                    config.msg = `Ivalid value: must be greater than or equal to ${oInfo["greater"]} \
+                    config.msg = `Ivalid value for field "${oInfo["target"].name}": must be greater than or equal to ${oInfo["greater"]} \
                     and less then or equal to ${oInfo["less"]}`;
                 }
                 else if (oInfo["greater"] != null) {
-                    config.msg = `Ivalid value: must be greater than or equal to ${oInfo["greater"]}`;
+                    config.msg = `Ivalid value for field "${oInfo["target"].name}": must be greater than or equal to ${oInfo["greater"]}`;
                 }
                 else if (oInfo["less"] != null) {
-                    config.msg = `Ivalid value: must be less than or equal to ${oInfo["less"]}`;
+                    config.msg = `Ivalid value for field "${oInfo["target"].name}": must be less than or equal to ${oInfo["less"]}`;
                 }
                 
 
