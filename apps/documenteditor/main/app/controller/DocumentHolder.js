@@ -1538,7 +1538,7 @@ define([
             var count = obj._options.length;
             for (var i=0; i<count; i++) {
                 menu.addItem(new Common.UI.MenuItem({
-                    caption     : obj._options[i],
+                    caption     : Array.isArray(obj._options[i]) ? obj._options[i][0] : obj._options[i],
                     value       : i,
                     template    : _.template([
                         '<a id="<%= id %>" style="<%= style %>" tabindex="-1" type="menuitem">',

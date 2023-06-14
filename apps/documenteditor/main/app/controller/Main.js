@@ -232,6 +232,7 @@ define([
                     this.api.asc_registerCallback('asc_onOpenLinkPdfForm',          _.bind(this.onOpenLinkPdfForm, this));
                     this.api.asc_registerCallback('asc_onOpenFilePdfForm',          _.bind(this.onOpenFilePdfForm, this));
                     this.api.asc_registerCallback('asc_onValidateErrorPdfForm',     _.bind(this.onValidateErrorPdfForm, this));
+                    this.api.asc_registerCallback('asc_onFormatErrorPdfForm',       _.bind(this.onFormatErrorPdfForm, this));
 
                     Common.NotificationCenter.on('api:disconnect',                  _.bind(this.onCoAuthoringDisconnect, this));
                     Common.NotificationCenter.on('goback',                          _.bind(this.goBack, this));
@@ -2223,7 +2224,32 @@ define([
 
                 (id!==undefined) && Common.component.Analytics.trackEvent('Internal Error', id.toString());
             },
+            onFormatErrorPdfForm: function(oInfo) {
+                var config = {
+                    closable: true
+                };
 
+                let id = 1;
+
+                config.msg = `The value entered does not match the format of the field [ ${oInfo["target"].GetFullName()} ]`;
+                if (oInfo["format"])
+                    config.msg += `. Field value should match format '${oInfo["format"]}'`;
+
+                Common.Gateway.reportWarning(id, config.msg);
+
+                config.title    = this.notcriticalErrorTitle;
+                config.iconCls  = 'warn';
+                config.buttons  = ['ok'];
+                config.needCancel = false;
+
+                
+                if (Common.Utils.ModalWindow.isVisible())
+                    Common.Utils.ModalWindow.close(true);
+
+                Common.UI.alert(config).$window.attr('data-value', id);
+
+                (id!==undefined) && Common.component.Analytics.trackEvent('Internal Error', id.toString());
+            },
 
             onCoAuthoringDisconnect: function() {
                 this.getApplication().getController('Viewport').getView('Viewport').setMode({isDisconnected:true});
